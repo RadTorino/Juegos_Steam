@@ -23,7 +23,7 @@ juegos_años.playtime_forever = juegos_años.playtime_forever/60
 async def ruta_prueba():
     return "Hola"
 
-@app.post("/UserForGenre"/{genero})
+@app.get("/UserForGenre"/{genero})
 async def UserForGenre(genero):
     #obtengo liste de ids de juegos que se corresponden con ese género
     juegos_id = juegos[juegos.genres.apply(lambda x:(genero.capitalize() in x) )]['id']
@@ -50,4 +50,7 @@ async def UserForGenre(genero):
     
     horas_jugadas_top = [{"Año": año, "Horas": horas} for año, horas in horas_por_año_ordenado[:3] if horas > 0]
     
-    return {f"Usuario con más horas jugadas para Género {genero.capitalize()}:" {max_user}, "Horas jugadas": {horas_jugadas_top}}
+    return {
+  f"Usuario con más horas jugadas para Género {genero.capitalize()}": {max_user},
+  "Horas jugadas": str(horas_jugadas_top)
+}
