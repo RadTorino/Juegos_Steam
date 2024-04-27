@@ -23,7 +23,7 @@ juegos_años.playtime_forever = juegos_años.playtime_forever/60
 async def ruta_prueba():
     return "Hola"
 
-@app.get("/UserForGenre"/{genero})
+@app.get("/UserForGenre")
 async def UserForGenre(genero):
     #obtengo liste de ids de juegos que se corresponden con ese género
     juegos_id = juegos[juegos.genres.apply(lambda x:(genero.capitalize() in x) )]['id']
