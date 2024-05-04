@@ -74,8 +74,9 @@ async def PlayTimeGenre(genero):
 
 @app.get("/UsersRecommend")
 async def UsersRecommend(año):
-    if int(año) not in reviews.posted.unique():
-        return f"No hay recomendaciones para ese año. Pruebe con uno de estos años: {reviews.posted.unique()}"
+    año = int(año)
+    if año not in reviews.posted.unique():
+        return f"No hay reviews para ese año. Pruebe con uno de estos años: {reviews.posted.unique()}"
     
     df = reviews[(reviews.posted == año)&(reviews['item_id'].isin(juegos.id))][['posted', 'item_id', 'recommend', 'sentiment_analysis']]
 
@@ -100,8 +101,9 @@ async def UsersRecommend(año):
     
 @app.get("/UsersNotRecommend")
 async def UsersNotRecommend(año):
-    if int(año) not in reviews.posted.unique():
-        return f"No hay recomendaciones para ese año. Pruebe con uno de estos años: {reviews.posted.unique()}"
+    año = int(año)
+    if año not in reviews.posted.unique():
+        return f"No hay reviews para ese año. Pruebe con uno de estos años: {reviews.posted.unique()}"
     
     df = reviews[(reviews.posted == año)&(reviews['item_id'].isin(juegos.id))][['posted', 'item_id', 'recommend', 'sentiment_analysis']]
 
