@@ -7,7 +7,7 @@ app = FastAPI()
 
 juegos = pd.read_csv('archivos_csv/games_final.csv')
 items = pd.read_csv('archivos_csv/items_final_pulido.csv')
-reviews = pd.read_csv('archivos_csv/reviews_final.csv')
+reviews = pd.read_csv('archivos_csv/reviews_sentiment_analysis.csv')
 
 
 #armo df acorde a las necesidades de la función
