@@ -55,7 +55,7 @@ async def UserForGenre(genero):
 
 
 @app.get("/PlayTimeGenre")
-def PlayTimeGenre(genero):
+async def PlayTimeGenre(genero):
     #obtengo lista de ids de juegos que se corresponden con ese género
     juegos_id = juegos[juegos.tags.apply(lambda x:(genero.capitalize() in x) )]['id']
     #filtro el df con los ids de los juegos que responden al género 
@@ -73,7 +73,7 @@ def PlayTimeGenre(genero):
     return {f"Año de lanzamiento con más horas jugadas para Género {genero.capitalize()} : {año}"}
 
 @app.get("/UsersRecommend")
-def UsersRecommend(año):
+async def UsersRecommend(año):
     if año not in reviews.posted.unique():
         return f"No hay recomendaciones para ese año. Pruebe con uno de estos años: {reviews.posted.unique()}"
     
@@ -99,7 +99,7 @@ def UsersRecommend(año):
 }
     
 @app.get("/UsersNotRecommend")
-def UsersNotRecommend(año):
+async def UsersNotRecommend(año):
     if año not in reviews.posted.unique():
         return f"No hay recomendaciones para ese año. Pruebe con uno de estos años: {reviews.posted.unique()}"
     
@@ -126,7 +126,7 @@ def UsersNotRecommend(año):
 }
 
 @app.get("/SentimentAnalysis")
-def SentimentAnalysis(año):
+async def SentimentAnalysis(año):
     juegos_de_ese_año = list(juegos[juegos['release_date']== año].id)
     reseñas = list(reviews[reviews['item_id'].isin(juegos_de_ese_año)]['sentiment_analysis'])
     if len(reseñas) == 0:
