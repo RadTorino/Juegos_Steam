@@ -24,7 +24,7 @@ async def ruta_prueba():
 @app.get("/UserForGenre")
 async def UserForGenre(genero):
     #obtengo liste de ids de juegos que se corresponden con ese género
-    juegos_id = juegos[juegos.tags.apply(lambda x:(genero.capitalize() in x) )]['id']
+    juegos_id = juegos[juegos.tags.apply(lambda x:(genero.lower() in x.lower()) )]['id']
     #creo diccionario con jugadores y horas jugadas
     jugadores = juegos_años.user_id.unique()
     horas_jugadas = { jugador:0 for jugador in jugadores}
@@ -57,7 +57,7 @@ async def UserForGenre(genero):
 @app.get("/PlayTimeGenre")
 async def PlayTimeGenre(genero):
     #obtengo lista de ids de juegos que se corresponden con ese género
-    juegos_id = juegos[juegos.tags.apply(lambda x:(genero.capitalize() in x) )]['id']
+    juegos_id = juegos[juegos.tags.apply(lambda x:(genero.lower() in x.lower()) )]['id']
     #filtro el df con los ids de los juegos que responden al género 
     juegos_filtrados = juegos_años[juegos_años['item_id'].isin(juegos_id)]
     # itero para sumar horas jugadas para cada jugador
