@@ -40,7 +40,7 @@ async def RecommendationSystem(id):
     indice = data[data.id == id].index[0]  #con el id del juego obtengo su índice
     sim_scores = list(enumerate(cosine_sim[indice])) #obtengo la lista de los elementos por similaridad. 
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True) #la ordeno de forma descendente, de mayor similitud a menor.
-    indices = [i[0] for i in sim_scores[1:5]] #empieza en el segundo elemento porque el primero es el mismo elemento que pasamos.
+    indices = [i[0] for i in sim_scores[1:6]] #empieza en el segundo elemento porque el primero es el mismo elemento que pasamos.
     return [data.loc[i,'app_name'] for i in indices] #con los indices obtengo los nombres de los juegos recomendados
 
 
