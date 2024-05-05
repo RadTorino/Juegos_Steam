@@ -20,6 +20,8 @@ juegos_años = pd.merge(items, reviews_fecha, on= ['user_id', 'item_id'], how='i
 
 @app.get("/RecommendationSystem")
 async def RecommendationSystem(id):
+
+    id = int(id) #Los valores de la API vienen en formato string
     #primero checkeamos que el id del juego esté dentro del sistema de recomendación. 
     if id not in data.id.tolist(): 
         return('El sistema no encuentra recomendación para ese juego')
