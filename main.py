@@ -1,5 +1,7 @@
 import pandas as pd
 from fastapi import FastAPI
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import StandardScaler
 
 app = FastAPI()
 
@@ -8,6 +10,7 @@ app = FastAPI()
 juegos = pd.read_csv('archivos_csv/games_final.csv')
 items = pd.read_csv('archivos_csv/items_final_pulido.csv')
 reviews = pd.read_csv('archivos_csv/reviews_sentiment_analysis.csv')
+data = pd.read_csv('archivos_csv/data_para_ML.csv') 
 
 
 #armo df acorde a las necesidades de la función
@@ -15,10 +18,29 @@ reviews = pd.read_csv('archivos_csv/reviews_sentiment_analysis.csv')
 reviews_fecha = reviews.drop(columns=['funny', 'helpful', 'recommend', 'sentiment_analysis']) #elimino las columnas que no me sirven
 juegos_años = pd.merge(items, reviews_fecha, on= ['user_id', 'item_id'], how='inner') #concateno para tener items y fecha de review en un mismo df
 
+@app.get("/RecommendationSystem")
+async def RecommendationSystem(id):
+    #primero checkeamos que el id del juego esté dentro del sistema de recomendación. 
+    if id not in data.id.tolist(): 
+        return('El sistema no encuentra recomendación para ese juego')
 
-@app.get("/")
-async def ruta_prueba():
-    return "Hola"
+    # uso StandardScaler para normalizar los valores. 
+    # Los valores dummies (de los generos o tags) no se normalizan ya que son booleanos, su interpretación no es numérica
+    scaler = StandardScaler()
+    features = data[['horas_jugadas', 'count', 'recommend', 'sentiment_analysis']]
+    scaled_features = pd.DataFrame(scaler.fit_transform(features))
+    tags =data[['Strategy',	'Action',	'Indie', 'Casual', 'Simulation',	'RPG',	'Adventure', 'Singleplayer']]
+    #combino todas las dimensiones que voy a tener en cuenta
+    final_features= pd.concat([scaled_features, tags], axis=1) 
+    #calculo la similitud de coseno
+    cosine_sim = cosine_similarity(scaled_features, scaled_features)
+
+    indice = data[data.id == id].index[0]  #con el id del juego obtengo su índice
+    sim_scores = list(enumerate(cosine_sim[indice])) #obtengo la lista de los elementos por similaridad. 
+    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True) #la ordeno de forma descendente, de mayor similitud a menor.
+    indices = [i[0] for i in sim_scores[1:5]] #empieza en el segundo elemento porque el primero es el mismo elemento que pasamos.
+    return [data.loc[i,'app_name'] for i in indices] #con los indices obtengo los nombres de los juegos recomendados
+
 
 
 @app.get("/UserForGenre")
@@ -74,21 +96,27 @@ async def PlayTimeGenre(genero):
 
 @app.get("/UsersRecommend")
 async def UsersRecommend(año):
-    año = int(año)
+    año = int(año) #desde la pagina viene en formato string
+    #chequeo que el año sea un año en que se hicieron recomendaciones
     if año not in reviews.posted.unique():
         return f"No hay reviews para ese año. Pruebe con uno de estos años: {reviews.posted.unique()}"
     
+    #filtro para quedarme solo con los juego del año selecciono y cuyos nombres están en el df juegos. 
     df = reviews[(reviews.posted == año)&(reviews['item_id'].isin(juegos.id))][['posted', 'item_id', 'recommend', 'sentiment_analysis']]
 
+    #creo un diccionario para contar el puntaje de recomendación para cada juego
     juegos_recomendados = {item :0 for item in df.item_id.unique()}
-    
+
+   # itero y sumo un punto si fue recomendado más el puntaje del análisis de sentimiento (0, 1 o 2) 
     for indice, fila in df.iterrows():
         if fila.recommend is True:
             juegos_recomendados[fila['item_id']] +=1
         juegos_recomendados[fila['item_id']] += fila.sentiment_analysis
     
+    #ordeno el diccionario de forma descendente.
     juegos_recomendados = sorted(juegos_recomendados.items(), key=lambda x: x[1], reverse=True)
     
+    #con el id obtengo el nombre de los juegos.
     juego1 = str(juegos[juegos['id'] == juegos_recomendados[0][0]]['app_name'].iloc[0])
     juego2 = str(juegos[juegos['id'] == juegos_recomendados[1][0]]['app_name'].iloc[0])
     juego3 = str(juegos[juegos['id'] == juegos_recomendados[2][0]]['app_name'].iloc[0])
@@ -101,22 +129,28 @@ async def UsersRecommend(año):
     
 @app.get("/UsersNotRecommend")
 async def UsersNotRecommend(año):
-    año = int(año)
+    año = int(año)#desde la pagina viene en formato string
+    #chequeo que el año sea un año en que se hicieron recomendacione
     if año not in reviews.posted.unique():
         return f"No hay reviews para ese año. Pruebe con uno de estos años: {reviews.posted.unique()}"
-    
+
+     #creo un diccionario para contar el puntaje de recomendación para cada juego
     df = reviews[(reviews.posted == año)&(reviews['item_id'].isin(juegos.id))][['posted', 'item_id', 'recommend', 'sentiment_analysis']]
 
+    #creo un diccionario para contar el puntaje de recomendación para cada juego
     juegos_recomendados = {item :0 for item in df.item_id.unique()}
     
+    # itero y sumo un punto si no fue recomendado y otro si el análisis de sentimiento de la review fue negativo
     for indice, fila in df.iterrows():
         if fila.recommend is False:
             juegos_recomendados[fila['item_id']] +=1
         if fila.sentiment_analysis == 0:
             juegos_recomendados[fila['item_id']] +=1
     
+    #ordeno el diccionario de forma descendente
     juegos_recomendados = sorted(juegos_recomendados.items(), key=lambda x: x[1], reverse=True)
     
+    #con el id obtengo el nombre de los juegos.
     juego1 = str(juegos[juegos['id'] == juegos_recomendados[0][0]]['app_name'].iloc[0])
     juego2 = str(juegos[juegos['id'] == juegos_recomendados[1][0]]['app_name'].iloc[0])
     juego3 = str(juegos[juegos['id'] == juegos_recomendados[2][0]]['app_name'].iloc[0])
@@ -129,9 +163,17 @@ async def UsersNotRecommend(año):
 
 @app.get("/SentimentAnalysis")
 async def SentimentAnalysis(año):
+    #filtro para quedarme con los ids de los juegos lanzados en el año seleccionado
     juegos_de_ese_año = list(juegos[juegos['release_date']== int(año)].id)
+
+    #filtro las reseñas solo de esos juegos
     reseñas = list(reviews[reviews['item_id'].isin(juegos_de_ese_año)]['sentiment_analysis'])
     if len(reseñas) == 0:
         return "No hay reseñas para juegos lanzados ese año"
     else:
+        #devuelvo contando la cantidad de 0, 1 y 2
         return f"Negative = {reseñas.count(0)}, Neutral = {reseñas.count(1)}, Positive = {reseñas.count(2)}"
+
+
+
+
