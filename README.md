@@ -15,7 +15,7 @@ El objetivo final es producir un **MVP** de una API que responda a 6 consultas d
 
 ## ETL: 
 
-En este paso (presente en el notebook **etl.ipynb**, se toman los 3 archivos comprimidos en formato json que están presentes en la carpeta **archivos_zip**. 
+En este paso (presente en el notebook **etl.ipynb**), se toman los 3 archivos comprimidos en formato json que están presentes en la carpeta **archivos_zip**. 
 Para realizar el proceso de extracción se utiliza la librería **gzip** para abri el archivo y luego se lee cada línea como un archivo json. 
 Luego se realizan distintos procesos de transformación de datos desde eliminar datos nulos o duplicados, transformar el tipo de dato de algunas columnas, etc. Se eliminan columnas con información repetida o muy parecida y columnas con información que no es necesaria para el análisis posterior. 
 También se realiza una reducción del dataset para facilitar el análisis, entiendo el caracter de MVP del proyecto. El dataset **items** se reduce de 5 millones de filas a 200 mil. Para esto utilizamos como criterio utilizar a los 1000 jugadores que más juegos jugaron y que han realizado reviews.

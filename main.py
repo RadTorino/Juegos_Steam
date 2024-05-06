@@ -19,7 +19,7 @@ reviews_fecha = reviews.drop(columns=['funny', 'helpful', 'recommend', 'sentimen
 juegos_años = pd.merge(items, reviews_fecha, on= ['user_id', 'item_id'], how='inner') #concateno para tener items y fecha de review en un mismo df
 
 @app.get("/RecommendationSystem")
-async def RecommendationSystem(id):
+async def recomendacion_juego(id):
 
     id = int(id) #Los valores de la API vienen en formato string
     #primero checkeamos que el id del juego esté dentro del sistema de recomendación. 
