@@ -18,7 +18,7 @@ El objetivo final es producir un **MVP** de una API que responda a 6 consultas d
 En este paso (presente en el notebook **etl.ipynb**), se toman los 3 archivos comprimidos en formato json que están presentes en la carpeta **archivos_zip**. 
 Para realizar el proceso de extracción se utiliza la librería **gzip** para abri el archivo y luego se lee cada línea como un archivo json. 
 Luego se realizan distintos procesos de transformación de datos desde eliminar datos nulos o duplicados, transformar el tipo de dato de algunas columnas, etc. Se eliminan columnas con información repetida o muy parecida y columnas con información que no es necesaria para el análisis posterior. 
-También se realiza una reducción del dataset para facilitar el análisis, entiendo el caracter de MVP del proyecto. El dataset **items** se reduce de 5 millones de filas a 200 mil. Para esto utilizamos como criterio utilizar a los 1000 jugadores que más juegos jugaron y que han realizado reviews.
+También se realiza una reducción del dataset para facilitar el análisis, entiendo el caracter de MVP del proyecto. El dataset **items** se reduce de 5 millones de filas a 300 mil. Para esto utilizamos como criterio utilizar a los 1000 jugadores que más juegos jugaron y que han realizado reviews.
 Finalmente se exportan en formato csv a la carpeta **archivos_csv** para poder ser utilizados por el main.py que generará los endpoints de la API.
 
 ## Feature Engeeniering
@@ -46,5 +46,12 @@ Las funciones son:
 
 **SentimentAnalysis** Recibe un año y devuelve la cantidad de reseñas negativas, neutras y positivas que obtuvieron los juegos lanzados ese año. 
 
+## Proximos pasos
 
+Para un desarrollo más integrado que genere un producto final, reconozco tres próximos pasos.
 
+El primero tiene que ver con trabajar con el total de la información, y no con un recorte. También se podría estudiar de qué forma trabajar con valores nulos.
+
+Además, se puede mejorar notablemente el análisis de sentimiento. En esta primer instancia se trabajo con un modelo empaquetado dentro de la librería nltk pero se podría investigar otro o incluso entrenar un modelo con parte de la data que permite etiquetarla luego. 
+
+Finalmente el sistema de recomendación puede modificarse en función de la data nueva. El dataset completo tiene 20 veces más data de la que utilizamos para el MVP. La cantidad de información para cada juego va a variar mucho con lo cual habría que hacer un nuevo EDA para examinar las variables más prominentes.
