@@ -1,4 +1,4 @@
-# Machine Learning Operations con datasets de Steam
+# Machine Learning Operations con Datasets de Steam
 
 Este trabajo es un Proyecto de Machine Learning Operations para el Proyecto Individidual n°1 de la carrera de Data Sciencia de Henry.
 El mismo consta de 4 partes:
